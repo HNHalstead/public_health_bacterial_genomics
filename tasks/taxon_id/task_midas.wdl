@@ -5,6 +5,7 @@ task midas {
     File read1
     File? read2
     File midas_db = "gs://theiagen-public-files-rp/terra/theiaprok-files/midas/midas_db_v1.2.tar.gz"
+    Int disk_size = 100
     String samplename
     String docker = "quay.io/fhcrc-microbiome/midas:v1.3.2--6"
     Int? memory = 32
@@ -67,13 +68,15 @@ task midas {
     File midas_log = "~{samplename}/species/~{samplename}_log.txt"
     String midas_primary_genus = read_string("PRIMARY_GENUS")
     String midas_secondary_genus = read_string("SECONDARY_GENUS")
-    String midas_secondary_genus_abundance = read_string("SECONDARY_GENUS_ABUNDANCE")
+    Float midas_secondary_genus_abundance = read_string("SECONDARY_GENUS_ABUNDANCE")
   }
   runtime {
-      docker: "~{docker}"
-      memory: "~{memory} GB"
-      cpu: cpu
-      disks: "local-disk 100 SSD"
-      preemptible: 0
+    docker: "~{docker}"
+    memory: "~{memory} GB"
+    cpu: cpu
+    disks: "local-disk " + disk_size + " SSD"
+    disk: disk_size + " GB"
+    maxRetries: 3
+    preemptible: 0
   }
 }
